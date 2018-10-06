@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -36,7 +37,7 @@ func main() {
 
 	possibleErrors := make(chan error, 2)
 
-	servers := []serverConf{
+	configurations := []serverConf{
 		{
 			port:   blPort,
 			router: router,
@@ -50,22 +51,28 @@ func main() {
 		},
 	}
 
-	for _, c := range servers {
-		go func(conf serverConf) {
+	servers := make([]*http.Server, 2)
+
+	for i, c := range configurations {
+		go func(conf serverConf, i int) {
 			log.Printf("The %s is preparing to handle connections...", conf.name)
-			server := &http.Server{
+			servers[i] = &http.Server{
 				Addr:    ":" + conf.port,
 				Handler: conf.router,
 			}
-			err := server.ListenAndServe()
+			err := servers[i].ListenAndServe()
 			if err != nil {
 				possibleErrors <- err
 			}
-		}(c)
+		}(c, i)
 	}
 
 	select {
 	case err := <-possibleErrors:
+		for _, s := range servers {
+			// propose a PR with context timeout
+			s.Shutdown(context.Background())
+		}
 		log.Fatal(err)
 	}
 }
