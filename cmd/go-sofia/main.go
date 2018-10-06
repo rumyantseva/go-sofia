@@ -75,7 +75,10 @@ func main() {
 			log.Printf("\nShutdown with timeout: %s\n", timeout)
 			ctx, cancel := context.WithTimeout(context.Background(), timeout)
 			defer cancel()
-			s.Shutdown(ctx)
+			customError := s.Shutdown(ctx)
+			if customError != nil {
+				log.Printf(customError)
+			}
 			log.Printf("Server gracefully stopped")
 		}
 		log.Fatal(err)
