@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/rumyantseva/go-sofia/internal/diagnostics"
 )
 
 func main() {
@@ -14,11 +15,18 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/", hello)
 
-	err := http.ListenAndServe(":8080", router)
+	go func() {
+		err := http.ListenAndServe(":8080", router)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	diagnostics := diagnostics.NewDiagnostics()
+	err := http.ListenAndServe(":8585", diagnostics)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 }
 
 func hello(w http.ResponseWriter, r *http.Request) {
