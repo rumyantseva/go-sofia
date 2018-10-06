@@ -9,7 +9,7 @@ ADD . /go/src/github.com/rumyantseva/go-sofia
 WORKDIR /go/src/github.com/rumyantseva/go-sofia
 
 # build the binary with go build
-CGO_ENABLED=0 go build \
+RUN CGO_ENABLED=0 go build \
 	-o bin/go-sofia github.com/rumyantseva/go-sofia/cmd/go-sofia
 
 # Stage 2. Run the binary
