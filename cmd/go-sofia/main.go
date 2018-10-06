@@ -77,7 +77,7 @@ func main() {
 			defer cancel()
 			customError := s.Shutdown(ctx)
 			if customError != nil {
-				log.Printf(customError)
+				fmt.Println(customError)
 			}
 			log.Printf("Server gracefully stopped")
 		}
