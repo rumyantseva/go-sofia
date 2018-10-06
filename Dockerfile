@@ -16,6 +16,7 @@ RUN CGO_ENABLED=0 go build \
 FROM scratch
 
 ENV PORT 8080
+ENV DIAG_PORT 8585
 
 COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
@@ -24,5 +25,6 @@ USER myapp
 
 COPY --from=0 /go/src/github.com/rumyantseva/go-sofia/bin/go-sofia /go-sofia
 EXPOSE $PORT
+EXPOSE $DIAG_PORT
 
 CMD ["/go-sofia"]
