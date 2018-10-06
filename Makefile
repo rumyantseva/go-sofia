@@ -21,10 +21,10 @@ CONTAINER_NAME?=${NAMESPACE}-${APP}
 CONTAINER_IMAGE?=${REGISTRY}/${CONTAINER_NAME}
 VALUES?=values-stable
 
-container:
+build:
 	docker build -t $(CONTAINER_IMAGE):$(RELEASE) .
 
-push: container
+push: build
 	docker push $(CONTAINER_IMAGE):$(RELEASE)
 
 deploy: push
