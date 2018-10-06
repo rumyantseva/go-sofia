@@ -74,7 +74,7 @@ func main() {
 			timeout := 5 * time.Second
 			log.Printf("\nShutdown with timeout: %s\n", timeout)
 			ctx, cancel := context.WithTimeout(context.Background(), timeout)
-			cancel()
+			defer cancel()
 			s.Shutdown(ctx)
 			log.Printf("Server gracefully stopped")
 		}
