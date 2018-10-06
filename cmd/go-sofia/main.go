@@ -10,6 +10,12 @@ import (
 	"github.com/rumyantseva/go-sofia/internal/diagnostics"
 )
 
+type serverConf struct {
+	port   string
+	router http.Handler
+	name   string
+}
+
 func main() {
 	log.Print("Starting the application...")
 
@@ -26,28 +32,37 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/", hello)
 
+	diagnostics := diagnostics.NewDiagnostics()
+
 	possibleErrors := make(chan error, 2)
 
-	go func() {
-		log.Print("The application server is preparing to handle connections...")
-		server := &http.Server{
-			Addr:    ":" + blPort,
-			Handler: router,
-		}
-		err := server.ListenAndServe()
-		if err != nil {
-			possibleErrors <- err
-		}
-	}()
+	servers := []serverConf{
+		{
+			port:   blPort,
+			router: router,
+			name:   "application server",
+		},
+		{
 
-	go func() {
-		log.Print("The diagnostics server is preparing to handle connections...")
-		diagnostics := diagnostics.NewDiagnostics()
-		err := http.ListenAndServe(":"+diagPort, diagnostics)
-		if err != nil {
-			possibleErrors <- err
-		}
-	}()
+			port:   diagPort,
+			router: diagnostics,
+			name:   "diagnostics server",
+		},
+	}
+
+	for _, c := range servers {
+		go func(conf serverConf) {
+			log.Printf("The %s is preparing to handle connections...", conf.name)
+			server := &http.Server{
+				Addr:    ":" + conf.port,
+				Handler: conf.router,
+			}
+			err := server.ListenAndServe()
+			if err != nil {
+				possibleErrors <- err
+			}
+		}(c)
+	}
 
 	select {
 	case err := <-possibleErrors:
