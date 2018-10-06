@@ -1,6 +1,8 @@
 # Stage 1. Build the binary
 FROM golang:1.11
 
+ENV RELEASE 0.0.1
+
 # add a non-privileged user
 RUN useradd -u 10001 myapp
 
@@ -10,6 +12,7 @@ WORKDIR /go/src/github.com/rumyantseva/go-sofia
 
 # build the binary with go build
 RUN CGO_ENABLED=0 go build \
+	-ldflags "-s -w -X github.com/rumyantseva/go-sofia/internal/version.Version=${RELEASE}" \
 	-o bin/go-sofia github.com/rumyantseva/go-sofia/cmd/go-sofia
 
 # Stage 2. Run the binary

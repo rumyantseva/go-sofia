@@ -12,6 +12,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/rumyantseva/go-sofia/internal/diagnostics"
+	"github.com/rumyantseva/go-sofia/internal/version"
 )
 
 type serverConf struct {
@@ -21,7 +22,7 @@ type serverConf struct {
 }
 
 func main() {
-	log.Print("Starting the application...")
+	log.Printf("Starting the application, v%s...", version.Version)
 
 	blPort := os.Getenv("PORT")
 	if len(blPort) == 0 {
