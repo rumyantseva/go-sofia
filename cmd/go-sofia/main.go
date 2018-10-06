@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/rumyantseva/go-sofia/internal/diagnostics"
@@ -71,7 +72,9 @@ func main() {
 	case err := <-possibleErrors:
 		for _, s := range servers {
 			// propose a PR with context timeout
-			s.Shutdown(context.Background())
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			s.Shutdown(ctx)
 		}
 		log.Fatal(err)
 	}
