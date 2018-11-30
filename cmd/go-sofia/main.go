@@ -21,9 +21,6 @@ type serverConf struct {
 	name   string
 }
 
-// try a case when we can't compile
-{
-
 func main() {
 	log.Printf("Starting the application, v%s...", version.Version)
 
