@@ -21,6 +21,9 @@ type serverConf struct {
 	name   string
 }
 
+// try to fail one more time
+{
+
 func main() {
 	log.Printf("Starting the application, v%s...", version.Version)
 
