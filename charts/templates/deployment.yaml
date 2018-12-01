@@ -35,6 +35,11 @@ spec:
           value: "{{ .Values.service.externalPort }}"
         - name: DIAG_PORT
           value: "{{ .Values.service.internalPort }}"
+        - name: K8S_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: default-token-wzm9f
+              key: token
         ports:
         - containerPort: {{ .Values.service.internalPort }}
         - containerPort: {{ .Values.service.externalPort }}

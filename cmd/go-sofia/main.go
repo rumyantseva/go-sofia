@@ -13,6 +13,9 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/rumyantseva/go-sofia/internal/diagnostics"
 	"github.com/rumyantseva/go-sofia/internal/version"
+	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 )
 
 type serverConf struct {
@@ -96,5 +99,35 @@ func main() {
 
 func hello(w http.ResponseWriter, r *http.Request) {
 	log.Print("The hello handler was called")
-	fmt.Fprint(w, http.StatusText(http.StatusOK))
+
+	token := os.Getenv("K8S_TOKEN")
+
+	config := &rest.Config{
+		Host:            "https://master.k8s.community:443",
+		BearerToken:     token,
+		TLSClientConfig: rest.TLSClientConfig{Insecure: true},
+	}
+
+	c, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Couldn't create a k8s client: %v", err)
+	}
+
+	podlist, err := c.Core().Pods("rumyantseva").List(meta.ListOptions{})
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Couldn't get the list of pods: %v", err)
+	}
+
+	var podnames []string
+	for _, pod := range podlist.Items {
+		podnames = append(podnames, pod.GetName())
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "The list of pods: [%v].", podnames)
 }
