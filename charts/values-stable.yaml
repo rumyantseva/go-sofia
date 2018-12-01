@@ -36,7 +36,7 @@ image:
   ##
   registry: docker.io/webdeva
   name: go-sofia
-  tag: 0.0.4
+  tag: 0.0.5
 
   ## Docker Registry/Hub image pull policy
   ##
