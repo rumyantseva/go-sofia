@@ -38,7 +38,7 @@ spec:
         - name: K8S_TOKEN
           valueFrom:
             secretKeyRef:
-              name: default-token-wzm9f
+              name: rumyantseva-token-64vpk
               key: token
         ports:
         - containerPort: {{ .Values.service.internalPort }}
